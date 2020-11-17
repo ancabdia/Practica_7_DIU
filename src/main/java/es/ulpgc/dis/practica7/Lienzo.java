@@ -56,7 +56,7 @@ public class Lienzo extends JPanel {
         return imagen;
     }
     
-    public Mat filtrarImagen(){
+    public Mat convertToMat(){
         Mat m = Imgcodecs.imread(fileName);
         return m;
     }    

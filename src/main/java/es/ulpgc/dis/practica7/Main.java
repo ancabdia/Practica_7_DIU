@@ -42,9 +42,27 @@ public class Main extends javax.swing.JFrame {
         @Override
         public void adjustmentValueChanged(AdjustmentEvent e) {
             if (!bloquear) {
-                stadistic.calculaEstadisticas(lienzo1.filtrarImagen(),
-                        scrollPanel.getViewport().getViewPosition(),
-                        scrollPanel.getViewport().getExtentSize());
+                showDetail(scrollPanel.getViewport().getViewPosition(), scrollPanel.getViewport().getExtentSize());
+            }
+        }
+    }
+
+    /**
+     * Creates new form Main
+     */
+    public Main() {
+        nu.pattern.OpenCV.loadShared();
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
+        initComponents();
+
+        close.setVisible(false);
+    }
+    
+    public void showDetail(Point x, Dimension y){
+        stadistic.calculaEstadisticas(lienzo1.convertToMat(),
+                        x,
+                        y);
 
                 maxStadistic = stadistic.getMaximo();
                 minStadistic = stadistic.getMinimo();
@@ -61,30 +79,6 @@ public class Main extends javax.swing.JFrame {
                 blueMax.setText(String.valueOf(maxStadistic[0]));
                 blueMin.setText(String.valueOf(minStadistic[0]));
                 blueProm.setText(String.valueOf(averageStadistic[0]));
-            }
-        }
-    }
-
-    /**
-     * Creates new form Main
-     */
-    public Main() {
-        nu.pattern.OpenCV.loadShared();
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
-        initComponents();
-
-        close.setVisible(false);
-
-        barraY = scrollPanel.getVerticalScrollBar();
-        barraX = scrollPanel.getHorizontalScrollBar();
-
-        scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        barraY.addAdjustmentListener(new ScrollBarListener());
-        barraX.addAdjustmentListener(new ScrollBarListener());
-
     }
 
     /**
@@ -403,6 +397,18 @@ public class Main extends javax.swing.JFrame {
         fc.addChoosableFileFilter(filtro);
         int res = fc.showOpenDialog(null);
         if (res == JFileChooser.APPROVE_OPTION) {
+            
+            barraY = scrollPanel.getVerticalScrollBar();
+        barraX = scrollPanel.getHorizontalScrollBar();
+
+        scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        barraY.addAdjustmentListener(new ScrollBarListener());
+        barraX.addAdjustmentListener(new ScrollBarListener());
+            
+            
+            
             close.setVisible(true);
 
             fichero = fc.getSelectedFile();
@@ -413,26 +419,9 @@ public class Main extends javax.swing.JFrame {
 
             if (lienzo1.getImagen().getHeight() <= scrollPanel.getHeight() || lienzo1.getImagen().getWidth() <= scrollPanel.getHeight()) {
                 bloquear = true;
-                stadistic.calculaEstadisticas(lienzo1.filtrarImagen(),
-                        new Point(0, 0),
-                        new Dimension(lienzo1.getImagen().getWidth(), lienzo1.getImagen().getHeight()));
-
-                maxStadistic = stadistic.getMaximo();
-                minStadistic = stadistic.getMinimo();
-                averageStadistic = stadistic.getPromedio();
-
-                redMax.setText(String.valueOf(maxStadistic[2]));
-                redMin.setText(String.valueOf(minStadistic[2]));
-                redProm.setText(String.valueOf(averageStadistic[2]));
-
-                greenMax.setText(String.valueOf(maxStadistic[1]));
-                greenMin.setText(String.valueOf(minStadistic[1]));
-                greenProm.setText(String.valueOf(averageStadistic[1]));
-
-                blueMax.setText(String.valueOf(maxStadistic[0]));
-                blueMin.setText(String.valueOf(minStadistic[0]));
-                blueProm.setText(String.valueOf(averageStadistic[0]));
-
+                
+                showDetail(new Point(0, 0), new Dimension(lienzo1.getImagen().getWidth(), lienzo1.getImagen().getHeight()));
+                
                 revalidate();
             } else {
                 bloquear = false;
@@ -445,16 +434,12 @@ public class Main extends javax.swing.JFrame {
 
     private void aboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutActionPerformed
         JOptionPane.showMessageDialog(rootPane,
-                "This app allows to open images and apply the Threshold fitler to it, for later saving it on your computer."
+                "This app allows to open images, for using the JViewport class to represent RGB colours on an image area."
                 + "\nHow to use it:\n"
                 + "\t 1- Using the menu File (Alt+F) click on Open (Ctrl+O) to load an image."
-                + "\n \t \t \t \t WARNING: Image must be maximum of 1024x768 pixels."
                 + "\n \n"
-                + "\t 2- You can apply a Threshold filter to the image by, going to menu Edit (Alt+E) by using (Ctrl+F)."
-                + "\n \t \t \t You will need to introduce a value between 0 and 255."
-                + "\n \n"
-                + "\t 3- You can Save an image by going to the menu File (Alt+F), and option Save (Ctrl+S) or Closing the image without saving."
-                + "\n \t \t \t You will need to specify the directory where you want to save the image and the format."
+                + "\t 2- You can scroll over the image to see the colours over the image"
+                + "\n \t \t \t \t WARNING: If image is very small, scrollbars wont be available, and data only would show the data of the origin image"
                 + "\n \n"
                 + "\t 4- You can exit the program by using the menu File (Alt+F) and the option Exit (ESC)."
                 + "\n \n"
@@ -478,6 +463,21 @@ public class Main extends javax.swing.JFrame {
 
     private void closeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeActionPerformed
         if (JOptionPane.showConfirmDialog(rootPane, "Would you like to close the file?", "Close file", JOptionPane.YES_NO_OPTION) == 0) {
+            
+            redMax.setText("");
+                redMin.setText("");
+                redProm.setText("");
+
+                greenMax.setText("");
+                greenMin.setText("");
+                greenProm.setText("");
+
+                blueMax.setText("");
+                blueMin.setText("");
+                blueProm.setText("");
+                
+                bloquear = true;
+            
             lienzo1.setFileName(null);
             lienzo1.repaint();
         }

@@ -60,14 +60,12 @@ public class EstadisticasImagen {
             // calcula el premodio del canal c de la subimagen
             Scalar prom_scalar = mean(bgr.get(c));
             
-            System.out.println("Color: " + Componentes[c]);
-            
             this.maximo[c] = (int) minmax.maxVal;
-            System.out.println("Maximo: " + this.maximo[c]);
+            
             this.minimo[c] = (int) minmax.minVal;
-            System.out.println("minimo: " + this.minimo[c]);
+            
             this.promedio[c] = (int) prom_scalar.val[0];
-            System.out.println("Promedio: " + this.promedio[c]);
+            
         }
     }
 
